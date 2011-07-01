@@ -75,7 +75,28 @@ class FieldDescriptor(object):
         default_lang = get_default_language()
 
         if lang_code == default_lang or not self.name in instance.__dict__:
+            old = False
+            if instance.__dict__.get(self.name):
+              old = instance.__dict__[self.name]
+              old_digest = make_digest(old)
+              new_digest = make_digest(value)
+
             instance.__dict__[self.name] = value
+            
+            # If the updated original has a translation, 
+            # give the translation new digest.
+            if old and old_digest != new_digest:
+              for lang, trash in settings.LANGUAGES:
+                if lang != default_lang:
+                  qs = KeyValue.objects.filter(digest=old_digest, language=lang).values('value')
+                  if qs.count() > 0:
+                    old_value = qs[0]['value']
+
+                    kv = KeyValue.objects.get_keyvalue(value, lang)
+                    kv.value = old_value
+                    kv.edited = True
+                    kv.save()
+
         else:
             original = instance.__dict__[self.name]
             if original == u'':

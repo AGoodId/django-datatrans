@@ -66,6 +66,9 @@ def model_list(request):
                               context_instance=RequestContext(request))
 
 
+#Modify:
+#'fields' actually contains items instead, 
+# so that the .html lists all fields of one object at a time.
 @staff_member_required
 def model_detail(request, slug, language):
     '''
@@ -104,22 +107,25 @@ def model_detail(request, slug, language):
     default_lang = utils.get_default_language()
     model_name = u'%s' % model._meta.verbose_name
 
-    field_list = []
+     i = 1
+    item_list = []
     first_unedited_translation = None
-    for field in fields.values():
+    objects = model.objects.values().distinct().all()
+    for object in objects:
         items = []
-        objects = model.objects.values(field.name).distinct().all().order_by(field.name)
-        for object in objects:
+        for field in fields.values():
             key = object[field.name]
             original = KeyValue.objects.get_keyvalue(key, default_lang)
             translation = KeyValue.objects.get_keyvalue(key, language)
             if first_unedited_translation is None and (not translation.edited or translation.fuzzy):
                 first_unedited_translation = translation
-            items.append({'original': original, 'translation': translation})
-        field_list.append({'name': field.name, 'verbose_name': unicode(field.verbose_name), 'items': items})
+            items.append({'name': field.name, 'original': original, 'translation': translation})
+        print object
+        item_list.append({'name': 'item %d' % i, 'verbose_name': 'item %d' % i , 'items': items})
+        i += 1
 
     context = {'model': model_name,
-               'fields': field_list,
+               'fields': item_list,
                'original_language': default_lang,
                'other_language': language,
                'progress': _get_model_stats(model, lambda x: x.filter(language=language)),
