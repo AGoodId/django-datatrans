@@ -149,14 +149,12 @@ class KeyValue(models.Model):
     # South can't hack this index, it mangles the order and cannot handle
     # foreign key and textfields. Just add it by hand.
     #
-    # class Meta:
-    #     unique_together = ('language', 'content_type', 'field', 'object_id', 'digest')
+    class Meta:
+        unique_together = ('language', 'content_type', 'field', 'object_id', 'digest')
 
     def __unicode__(self):
         return u'%s: %s' % (self.language, self.value)
 
-    class Meta:
-        unique_together = ('digest', 'language')
 
 class WordCount(models.Model):
     class Meta:
