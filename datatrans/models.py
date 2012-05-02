@@ -146,9 +146,6 @@ class KeyValue(models.Model):
 
     objects = KeyValueManager()
 
-    # South can't hack this index, it mangles the order and cannot handle
-    # foreign key and textfields. Just add it by hand.
-    #
     class Meta:
         unique_together = ('language', 'content_type', 'field', 'object_id', 'digest')
 
