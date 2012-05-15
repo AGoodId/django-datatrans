@@ -8,7 +8,10 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        db.delete_unique('datatrans_keyvalue', ['digest', 'language'])
+        try:
+            db.delete_unique('datatrans_keyvalue', ['digest', 'language'])
+        except:
+            pass
         db.create_unique('datatrans_keyvalue', ['language', 'content_type_id', 'field', 'object_id', 'digest'])
 
     def backwards(self, orm):
