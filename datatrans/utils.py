@@ -108,7 +108,8 @@ def get_current_language():
         lang = lang.split('-')[0]
         current = [l[0] for l in settings.LANGUAGES if l[0] == lang]
     if len(current) == 0:
-        raise ImproperlyConfigured("The current language '%s' is not found in your LANGUAGES setting." % lang)
+        return get_default_language()
+        #raise ImproperlyConfigured("The current language '%s' is not found in your LANGUAGES setting." % lang)
     return current[0]
 
 
